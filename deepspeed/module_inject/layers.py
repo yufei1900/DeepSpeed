@@ -351,7 +351,6 @@ class LinearAllreduce(TensorParallel_Layer):
                 return
             params_list[idx].data_partition = param.data
             param = param.transpose(0, 1).contiguous()
-            print(param.shape)
             output_param = torch.empty(self.tp_world_size * param.shape[0],
                                        param.shape[1],
                                        dtype=param.dtype,
@@ -420,6 +419,7 @@ class LinearLayer(TensorParallel_Layer):
         for idx, param in enumerate(params_list):
 
             params_list[idx].data_partition = param.data
+            print(param.shape)
             output_param = torch.empty(self.tp_world_size * param.shape[0],
                                        param.shape[1],
                                        dtype=param.dtype,

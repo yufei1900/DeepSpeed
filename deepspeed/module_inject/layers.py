@@ -339,7 +339,7 @@ class LinearAllreduce(TensorParallel_Layer):
         output = torch.matmul(input, self.weight.transpose(-1, -2))
         output = RowParallel.apply(self.mp_group, output, not self.is_training_mode())
         if self.bias is not None:
-            output += self.bias
+            output = output + self.bias
         return output
 
     @torch.no_grad()

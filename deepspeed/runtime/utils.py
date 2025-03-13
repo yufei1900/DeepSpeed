@@ -1145,7 +1145,6 @@ def compare_tensors_in_structures(inputs1: Union[List, Dict], inputs2: Union[Lis
             return False
         for key in inputs1:
             val1, val2 = inputs1[key], inputs2[key]
-            print(type(val1), type(val2))
             if type(val1) is list and type(val2) is list:
                 return is_equal_recursive(val1, val2)
             else:

@@ -1102,6 +1102,16 @@ def reload_adam_states(optimizer, device, non_blocking: bool = False):
         if "exp_avg_sq" in state:
             move_back_key(state, "exp_avg_sq")
 
+def is_equal_recursive(a, b):
+    """递归检查 a 和 b 是否完全相同"""
+    if isinstance(a, torch.Tensor) and isinstance(b, torch.Tensor):
+        a = a.to(get_accelerator().current_device())
+        b = b.to(get_accelerator().current_device())
+        return torch.equal(a, b)  # 直接比较张量
+    if isinstance(a, list) and isinstance(b, list) and len(a) == len(b):
+        return all(is_equal_recursive(ai, bi) for ai, bi in zip(a, b))
+    return False  # 结构不匹配
+
 
 def compare_tensors_in_structures(inputs1: Union[List, Dict], inputs2: Union[List, Dict]) -> bool:
     """
@@ -1137,13 +1147,7 @@ def compare_tensors_in_structures(inputs1: Union[List, Dict], inputs2: Union[Lis
             val1, val2 = inputs1[key], inputs2[key]
             print(type(val1), type(val2))
             if type(val1) is list and type(val2) is list:
-                val1 = [val.to(get_accelerator().current_device()) for val in val1]
-                val2 = [val.to(get_accelerator().current_device()) for val in val2]
-                if len(val1) != len(val2):
-                    return False
-                for idx in range(len(val1)):
-                    if not torch.equal(val1[idx], val2[idx]):
-                        return False
+                return is_equal_recursive(val1, val2)
             else:
                 val1 = val1.to(get_accelerator().current_device())
                 val2 = val2.to(get_accelerator().current_device())

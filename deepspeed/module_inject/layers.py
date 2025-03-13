@@ -419,11 +419,15 @@ class LinearLayer(TensorParallel_Layer):
         for idx, param in enumerate(params_list):
 
             params_list[idx].data_partition = param.data
-            print(param.shape)
-            output_param = torch.empty(self.tp_world_size * param.shape[0],
-                                       param.shape[1],
+            if len(param.shape) == 1:
+                output_param = torch.empty(self.tp_world_size * param.shape[0],
                                        dtype=param.dtype,
                                        device=param.device)
+            else:
+                output_param = torch.empty(self.tp_world_size * param.shape[0],
+                                        param.shape[1],
+                                        dtype=param.dtype,
+                                        device=param.device)
             dist.all_gather_into_tensor(output_param, param, group=self.mp_group)
             params_list[idx].data = output_param.contiguous()
 

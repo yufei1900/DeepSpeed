@@ -1137,9 +1137,13 @@ def compare_tensors_in_structures(inputs1: Union[List, Dict], inputs2: Union[Lis
             val1, val2 = inputs1[key], inputs2[key]
             print(type(val1), type(val2))
             if type(val1) is list and type(val2) is list:
-                print(val1, val2)
                 val1 = [val.to(get_accelerator().current_device()) for val in val1]
                 val2 = [val.to(get_accelerator().current_device()) for val in val2]
+                if len(val1) != len(val2):
+                    return False
+                for idx in range(len(val1)):
+                    if val1[idx] != val2[idx]:
+                        return False
             else:
                 val1 = val1.to(get_accelerator().current_device())
                 val2 = val2.to(get_accelerator().current_device())

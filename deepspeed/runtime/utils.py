@@ -1142,7 +1142,7 @@ def compare_tensors_in_structures(inputs1: Union[List, Dict], inputs2: Union[Lis
                 if len(val1) != len(val2):
                     return False
                 for idx in range(len(val1)):
-                    if val1[idx] != val2[idx]:
+                    if not torch.equal(val1[idx], val2[idx]):
                         return False
             else:
                 val1 = val1.to(get_accelerator().current_device())
